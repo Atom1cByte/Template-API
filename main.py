@@ -1,4 +1,5 @@
 import os, uvicorn
+from routes import apps
 from fastapi import FastAPI
 from rich.console import Console
 
@@ -6,17 +7,12 @@ from rich.console import Console
 
 app = FastAPI()
 console = Console()
-apps = []
 
 # --- Import API Routes --- #
-for route in [file[:-3] for file in os.listdir("./routes") if file.endswith(".py")]:
-    exec("from routes.{} import app as route".format(route))
-    exec("apps.append(route)")
-    exec("del route")
 
 for route in apps:
     app.include_router(route)
-    console.log("[API] Loaded route: {}".format(route))
+    console.log("[API] Loaded router: {}".format(route))
 
 # --- Events --- #
 
@@ -41,3 +37,4 @@ async def home():
 
 if __name__ == "__main__":
     uvicorn.run(f"{os.path.basename(__file__).replace('.py', '')}:app", host="0.0.0.0", port=80, reload=True)
+
